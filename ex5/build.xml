@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ex" default="test">
+	<property name="src" value="src" />
+	<property name="bin" value="bin" />
+	<property name="libdir" value="../lib" />
+	<target name="clean">
+	  <delete failonerror="false" dir="${bin}" includeemptydirs="true"/>
+	  <mkdir dir="${bin}"/>
+	</target>
+	<target name="compile" depends="clean">
+		<javac srcdir="${src}" 
+			destdir="${bin}" 
+			classpath="${libdir}/mockito-all-1.8.0.jar:${libdir}/junit-4.6.jar"/>
+	</target>
+	<target name="test" depends="compile">
+	<junit printsummary="yes" haltonfailure="yes">
+	  	<classpath>
+	    	<pathelement location="bin"/>
+        	<pathelement location="${libdir}/mockito-all-1.8.0.jar"/>
+        	<pathelement location="${libdir}/junit-4.6.jar"/>
+    	</classpath>
+
+		<batchtest fork="yes" todir="${bin}">
+		    <fileset dir="${src}">
+		      <include name="**/*Test.java"/>
+		      <exclude name="**/AllTests.java"/>
+		    </fileset>
+		  </batchtest>
+
+    	</junit>
+	</target>
+	
+</project>

@@ -1,0 +1,8 @@
+!path ../ex10/bin
+
+|Import|
+|example|
+
+!|Hello World From FitNesse|
+|first word|second word|together?|
+|Hello|World|Hello World|
