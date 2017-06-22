@@ -2,7 +2,9 @@ package roulette;
 
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static org.testng.Assert.assertEquals;
+
 public class HelloWorldTest {
 
 	// this would normally be in a separate (domain) class
@@ -26,8 +28,9 @@ public class HelloWorldTest {
 	private void burp(){
 		throw new IllegalArgumentException("Exception");
 	}
-	@Test(expected=IllegalArgumentException.class)
-	public void burp_throws_exception(){
+
+	@Test(expected = IllegalArgumentException.class)
+	public void burp_throws_exception() {
 		// arrange
 		// act
 		burp();

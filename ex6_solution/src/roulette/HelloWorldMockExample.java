@@ -1,15 +1,16 @@
 package roulette;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+
 import static org.mockito.Mockito.*;
+
 public class HelloWorldMockExample {
 	OutputStream mock;
 	OutputStreamWriter osw;

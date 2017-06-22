@@ -1,12 +1,12 @@
 package roulette;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
-import static org.mockito.Mockito.*;
-
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 public class RouletteTableTest {
 
 	Player p;
