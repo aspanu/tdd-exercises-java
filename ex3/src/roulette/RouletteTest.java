@@ -2,7 +2,12 @@ package roulette;
 
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static roulette.Category.EVEN;
+import static roulette.Category.ODD;
+
 public class RouletteTest {
 
 	Player p;
@@ -12,11 +17,27 @@ public class RouletteTest {
 		p=new Player();
 		rt=new RouletteTable(10000);
 	}
+
 	@Test
 	public void player_can_place_bets_on_number_fields() throws TooManyChipsException, TableFullException{
 		rt.placeBet(p,17,200);
-		assertEquals(new Bet(p,200),rt.betsByField(17).get(0));
+		assertEquals(new Bet(p,200), rt.betsByField(17).get(0));
 	}
+
+	@Test
+	public void player_can_place_bets_on_categories() throws TooManyChipsException, TableFullException {
+		rt.placeBet(p, EVEN,200);
+		assertEquals(new Bet(p,200), rt.betsByField(EVEN).get(0));
+        rt.placeBet(p, ODD,300);
+        assertEquals(new Bet(p,300), rt.betsByField(ODD).get(0));
+	}
+
+	@Test
+    public void player_can_place_split_bets() throws TooManyChipsException, TableFullException {
+        rt.placeBet(p, new Integer[]{3, 4, 5, 6}, 200);
+        assertEquals(new Bet(p, 200), rt.betsByField(new Integer[]{3, 4, 5, 6}).get(0));
+    }
+
 	@Test
 	public void player_can_place_bets_on_different_fields_and_with_different_values() throws TooManyChipsException, TableFullException{
 		rt.placeBet(p,17,200);
@@ -26,6 +47,7 @@ public class RouletteTest {
 		assertEquals(new Bet(p,600),rt.betsByField(2).get(0));
 		assertEquals(new Bet(p,1000), rt.betsByField(30).get(0));
 	}
+
 	@Test
 	public void Total_number_of_chips_is_limited_by_the_table_and_the_table_can_refuse_a_bet_if_there_are_too_many_chips() throws TooManyChipsException, TableFullException{ 
 		RouletteTable rt=new RouletteTable(300);
@@ -42,6 +64,7 @@ public class RouletteTest {
 		assertEquals(0,rt.betsByField(20).size());
 		assertTrue(exceptionThrown);
 	}
+
 	@Test (expected=TableFullException.class)
 	public void up_to_eight_players_can_join_a_game() throws TooManyChipsException, TableFullException{
 			Player[] players=new Player[8];
@@ -52,6 +75,7 @@ public class RouletteTest {
 			Player nine=new Player();
 			rt.placeBet(nine,20,100);	
 	}
+
 	@Test
 	public void each_player_is_assigned_a_different_colour() throws TooManyChipsException, TableFullException{
 		Player[] players=new Player[8];
@@ -63,5 +87,26 @@ public class RouletteTest {
 			 for (int j=i+1; j<players.length; j++)
 				assertTrue(rt.getColour(players[i])!=rt.getColour(players[j]));
 	}
+
+    @Test
+    public void old_players_do_not_have_colour_reassigned() throws TooManyChipsException, TableFullException{
+	    rt.placeBet(p, 20, 100);
+        Player[] players=new Player[8];
+        for (int i=0; i<7; i++){
+            players[i]=new Player();
+            rt.placeBet(players[i],20,100);
+        }
+        players[7] = p;
+        for (int i=0; i<players.length-1; i++)
+            for (int j=i+1; j<players.length; j++)
+                assertTrue(rt.getColour(players[i])!=rt.getColour(players[j]));
+
+        rt.placeBet(p, 10, 100);
+        for (int i=0; i<players.length-1; i++)
+            for (int j=i+1; j<players.length; j++)
+                assertTrue(rt.getColour(players[i])!=rt.getColour(players[j]));
+
+    }
+
 }
 
