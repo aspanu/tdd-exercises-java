@@ -21,21 +21,36 @@ public class RouletteTable {
 	private Set<Player> waitingForPlayersToComplete=new HashSet<Player>();
 	private Timer timer;
 	private long ballStartedRolling=0;
-	public void placeBet(Player p,Field field, int value) throws TooManyChipsException, TableFullException, NoMoreBetsException {
+	private Bank bank;
+
+	public RouletteTable(int maxChips, RandomNumberGenerator rng, TestTimer timer,
+						 Bank bank) {
+		this(maxChips, rng, timer);
+		this.bank = bank;
+	}
+
+    public void placeBet(Player p,Field field, int value) throws TooManyChipsException, TableFullException, NoMoreBetsException {
 		placeBet(p,new Field[]{field}, value);
 	}
 	public void placeBet(Player p, Field fields[], int value) throws TooManyChipsException, TableFullException, NoMoreBetsException {
 		if (currentChipsOnTable()+value>maxChipsOnTable) throw new TooManyChipsException();
 		if (!players.keySet().contains(p) && players.size()==MAX_PLAYERS) throw new TableFullException();
 		if (isBallRolling() && (timer.getTimeInMillis()-ballStartedRolling>CUT_OFF_TIME)) throw new NoMoreBetsException();
-		players.put(p,Colour.values()[players.size()]);
+
+
+		// validation
+        if(!bank.deductForPlayer(p, value))
+            throw new TooManyChipsException();
+
+		// bet is allowed
+        players.put(p,Colour.values()[players.size()]);
 		for (Field field:fields){
 			if (betsByFields.get(field)==null){
 				betsByFields.put(field, new ArrayList<Bet>());
 			}
 			betsByFields.get(field).add(new Bet(p,value, getBetType(fields)));
 		}
-		waitingForPlayersToComplete.add(p);
+        waitingForPlayersToComplete.add(p);
 	}
 	private BetType getBetType(Field[] fields) {
 		if (fields.length==1) return BetType.SINGLE;
@@ -59,6 +74,7 @@ public class RouletteTable {
 		this.maxChipsOnTable=maxChipsOnTable;
 		this.rng=rng;
 		this.timer=timer;
+		this.bank = new Bank();
 	}
 	public Colour getColour(Player player) {
 		return players.get(player);

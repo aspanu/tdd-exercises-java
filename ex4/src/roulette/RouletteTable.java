@@ -9,10 +9,23 @@ import java.util.Map;
 public class RouletteTable {
 	private static final List<Bet> EMPTY = Collections.unmodifiableList(new ArrayList<Bet>());
 	private static final int MAX_PLAYERS = 8;
+	private RandomProvider rp;
 	private Map<Field,List<Bet>> betsByFields=new HashMap<Field,List<Bet>>();
 	private int maxChipsOnTable;
 	
 	private Map<Player, Colour> players=new HashMap<Player,Colour>();
+
+	public RouletteTable(RandomProvider rp) {
+		this.rp = rp;
+		this.maxChipsOnTable = 10000;
+	}
+
+    public RouletteTable(RandomProvider rp, int maxChipsOnTable) {
+        this.rp = rp;
+        this.maxChipsOnTable=maxChipsOnTable;
+    }
+
+
 	public void placeBet(Player p,Field field, int value) throws TooManyChipsException, TableFullException {
 		placeBet(p,new Field[]{field}, value);
 	}
@@ -41,15 +54,20 @@ public class RouletteTable {
 		}
 		return total;
 	}
+
 	public List<Bet> betsByField(Field field) {
 		if (betsByFields.get(field)==null) return EMPTY;
 		return betsByFields.get(field);
 	}
-	public RouletteTable(int maxChipsOnTable) {
-		this.maxChipsOnTable=maxChipsOnTable;
-	}
+
 	public Colour getColour(Player player) {
 		return players.get(player);
 	}
 
+	public void finishRound(Player p) {
+	}
+
+	public int getLastRoll() {
+		return rp.getNextNumber(0, 35);
+	}
 }

@@ -1,21 +1,22 @@
 package roulette;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
+
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
 public class RouletteTableTest {
 
 	Player p;
 	RouletteTable rt;
-	TestRandomNumberGenerator rng;
+	RandomNumberGenerator rng;
 	TestTimer timer;
 	@Before
 	public void setUp(){
 		p=new Player();
-		rng=new TestRandomNumberGenerator();
+		rng=mock(RandomNumberGenerator.class);;
 		timer=new TestTimer();
 		rt=new RouletteTable(10000,rng,timer);
 	}
@@ -96,8 +97,8 @@ public class RouletteTableTest {
 		assertTrue(rt.isBallRolling());
 	}
 	@Test
-	public void ball_rolls_for_a_random_time_between_30_and_40_seconds() throws Exception{
-		rng.setNextOutcome(33);
+	public void ball_rolls_for_a_random_time_between_30_and_40_seconds() throws Exception {
+        when(rng.generate(0, 36)).thenReturn(33);
 		rt.roll();
 		timer.moveTime(33001);
 		assertFalse(rt.isBallRolling());
@@ -105,7 +106,8 @@ public class RouletteTableTest {
 	@Test
 	public void game_gets_a_random_outcome_when_the_ball_stops_rolling(){
 		//act
-		rng.setNextOutcome(13);
+        when(rng.generate(0, 36)).thenReturn(13);
+
 		rt.stopRolling();
 		//assert
 		assertEquals(13,rt.getBallPosition());
@@ -113,13 +115,15 @@ public class RouletteTableTest {
 	
 	@Test
 	public void winning_bets_contain_all_bets_with_field_winning_strategy_covering_ball_position() throws Exception{
-		//arrange
-		Player p2=new Player();
+	    //arrange
+        when(rng.generate(0, 36)).thenReturn(2);
+
+        Player p2=new Player();
 		Player p3=new Player();
 		rt.placeBet(p, new Field("A", new TestWinningStrategy(2,false)), 1);
 		rt.placeBet(p2, new Field("B", new TestWinningStrategy(2,true)), 2);
 		rt.placeBet(p3, new Field("C", new TestWinningStrategy(2,false)), 3);
-		rng.setNextOutcome(2);
+
 		//act
 		rt.stopRolling();
 		//assert
@@ -136,11 +140,18 @@ public class RouletteTableTest {
 	}
 	@Test(expected=NoMoreBetsException.class)
 	public void players_cannot_place_bets_when_the_ball_starts_rolling_after_10_seconds() throws Exception{
-		rng.setNextOutcome(30000);
+        when(rng.generate(30, 40)).thenReturn(30000);
+
 		rt.roll();
 		timer.moveTime(10001);
 		rt.placeBet(p, Field.forNumber(1), 1);				
 	}
 
+	@Test
+    public void testChipsAreBeingDeducted() throws TableFullException, NoMoreBetsException, TooManyChipsException {
+        rt.placeBet(p,Field.forNumber(17),200);
+
+
+    }
 }
 
